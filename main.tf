@@ -24,6 +24,7 @@ resource null_resource patch_sbo {
   }
 } 
 
+/* don't run yet
 
 resource null_resource setup_gitops {
   depends_on = [null_resource.patch_sbo]
@@ -36,4 +37,4 @@ resource null_resource setup_gitops {
       GITOPS_CONFIG   = yamlencode(var.gitops_config)
     }
   }
-}
+}  */

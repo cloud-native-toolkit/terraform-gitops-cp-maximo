@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
-MODULE_DIR=$(cd "${SCRIPT_DIR}/.."; pwd -P)
+CHART_DIR=$(cd "${SCRIPT_DIR}/../charts"; pwd -P)
 
-NAME="$1"
-DEST_DIR="$2"
+DEST_DIR="$1"
 
-## Add logic here to put the yaml resource content in DEST_DIR
+mkdir -p "${DEST_DIR}"
 
-find "${DEST_DIR}" -name "*"
+
+echo "adding patching sbo..."
+#add chart to deployment directory
+cp "${CHART_DIR}/sbo.yaml" "${DEST_DIR}/sbo.yaml"
+

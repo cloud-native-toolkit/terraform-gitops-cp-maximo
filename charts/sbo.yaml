@@ -1,0 +1,15 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: rh-service-binding-operator
+  namespace: openshift-operators
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  channel: preview
+  name: rh-service-binding-operator
+  source: redhat-operators 
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic
+  startingCSV: service-binding-operator.v0.8.0
+ 
