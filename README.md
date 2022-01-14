@@ -1,5 +1,5 @@
 #  Maximo Gitops terraform module
-![Verify and release module](https://github.com/cloud-native-toolkit/terraform-gitops-ocp-turbonomic/workflows/Verify%20and%20release%20module/badge.svg)
+![Verify and release module](https://github.com/cloud-native-toolkit/terraform-gitops-cp-maximo/workflows/Verify%20and%20release%20module/badge.svg)
 
 Deploys Maximo Application Suite via gitops - UNDER DEVELOPMENT
 ```
