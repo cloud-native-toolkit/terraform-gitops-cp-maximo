@@ -78,3 +78,9 @@ variable "server_name" {
   description = "The name of the server"
   default     = "default"
 }
+
+variable "entitlementkey" {
+  type        = string
+  description = "IBM entitlement key for MAS"
+}
+

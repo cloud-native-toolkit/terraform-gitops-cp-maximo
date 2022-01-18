@@ -24,6 +24,28 @@ resource null_resource patch_sbo {
   }
 } 
 
+// Add entitlement secret Need to Add secret name ibm-entitlement
+
+module "gitops_module" {
+  source = "github.com/cloud-native-toolkit/terraform-gitops-pull-secret"
+
+  gitops_config = module.gitops.gitops_config
+  git_credentials = module.gitops.git_credentials
+  server_name = module.gitops.server_name
+  namespace = module.gitops_namespace.name
+  kubeseal_cert = module.gitops.sealed_secrets_cert
+  docker_server = "cp.icr.io"
+  docker_username = "cp"
+  docker_password = var.entitlementkey
+}
+
+# Update CRDs needed
+# Deploy truststore manager
+# Deploy needed common services
+# Install IBM Maximo Application Suite operator
+# Install IBM Maximo Application Suite core systems
+
+
 /* don't run yet
 
 resource null_resource setup_gitops {
