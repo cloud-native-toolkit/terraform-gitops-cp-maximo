@@ -12,7 +12,23 @@ module setup_clis {
   source = "github.com/cloud-native-toolkit/terraform-util-clis.git"
 }
 
+// patch SBO to v0.8.0 level-manual approval
+module "service_account" {
+  source = "github.com/cloud-native-toolkit/terraform-gitops-service-account"
 
+  gitops_config = var.gitops_config
+  git_credentials = var.git_credentials
+  namespace = "openshift-operators"
+  name = "installplan-approver-job"
+  rbac_rules = [{
+    apiGroups = ["operators.coreos.com"]
+    resources = ["installplans","subscriptions"]
+    verbs = ["get","list","patch"]
+  }]
+  sccs = ["anyuid"]
+  server_name = var.server_name
+  rbac_cluster_scope = false
+}
 
 resource null_resource patch_sbo {
   provisioner "local-exec" {
@@ -39,7 +55,13 @@ module "gitops_module" {
   docker_password = var.entitlementkey
 }
 
-# Update CRDs needed
+# Update MAS Core CRD
+
+
+
+
+
+
 # Deploy truststore manager
 # Deploy needed common services
 # Install IBM Maximo Application Suite operator

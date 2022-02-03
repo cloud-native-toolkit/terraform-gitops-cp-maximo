@@ -84,3 +84,14 @@ variable "entitlementkey" {
   description = "IBM entitlement key for MAS"
 }
 
+variable "cluster_ingress" {
+  type        = string
+  description = "Ingress for cluster"
+}
+
+variable "instanceid" {
+  type        = string
+  description = "instance ID for MAS"
+  default     = "mas85"
+}
+
