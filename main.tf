@@ -57,14 +57,39 @@ module "gitops_module" {
 
 # Update MAS Core CRD
 
-
-
-
+resource null_resource update_coreCRD {
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/updateCRD.sh '${local.yaml_dir}' ${var.cluster_ingress} ${var.cluster_ingress}"
+    
+    environment = {
+      BIN_DIR = local.bin_dir
+    }
+  }
+} 
 
 
 # Deploy truststore manager
+
+// insert call to TM gitops module
+
 # Deploy needed common services
+
+// may be done via cp4d work- check on this otherwise insert call to ibm-cs module 
+
 # Install IBM Maximo Application Suite operator
+
+resource "null_resource" "deployMASop" {
+
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.instanceid} ${var.versionid}"
+
+    environment = {
+      KUBECONFIG = self.triggers.kubeconfig
+    }
+  }
+
+}
+
 # Install IBM Maximo Application Suite core systems
 
 
