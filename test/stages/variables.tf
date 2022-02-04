@@ -19,11 +19,6 @@ variable "bootstrap_prefix" {
   default = ""
 }
 
-variable "namespace" {
-  type        = string
-  description = "Namespace for tools"
-}
-
 variable "cluster_name" {
   type        = string
   description = "The name of the cluster"

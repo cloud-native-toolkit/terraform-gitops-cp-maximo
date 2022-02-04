@@ -91,12 +91,14 @@ variable "cluster_ingress" {
 
 variable "instanceid" {
   type        = string
-  description = "instance ID for MAS"
+  description = "instance ID for MAS - must match format: mas85 / mas86 "
   default     = "mas85"
 }
 
 variable "versionid" {
   type        = string
-  description = "version for MAS"
-  default     = "8.5.0"
+  description = "version for MAS - this must match the update channel: 8.x for latest, or 8.5.x / 8.6.x etc."
+  default     = "8.x"
 }
+
+

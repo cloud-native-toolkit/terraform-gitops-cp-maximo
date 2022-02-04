@@ -1,4 +1,4 @@
-module "gitops_module" {
+module "mas_appsuite" {
   source = "./module"
 
   gitops_config = module.gitops.gitops_config
@@ -6,4 +6,7 @@ module "gitops_module" {
   server_name = module.gitops.server_name
   namespace = module.gitops_namespace.name
   kubeseal_cert = module.gitops.sealed_secrets_cert
+  versionid = "8.5.x"
+  instanceid = "mas85"
+  
 }

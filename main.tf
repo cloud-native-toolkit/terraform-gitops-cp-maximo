@@ -31,6 +31,8 @@ module "service_account" {
 }
 
 resource null_resource patch_sbo {
+  depends_on = [module.service_account]
+
   provisioner "local-exec" {
     command = "${path.module}/scripts/patchSBO.sh '${local.yaml_dir}' "
     
@@ -41,20 +43,21 @@ resource null_resource patch_sbo {
 } 
 
 // Add entitlement secret Need to Add secret name ibm-entitlement
-
-module "gitops_module" {
+module "add_entitlement" {
   source = "github.com/cloud-native-toolkit/terraform-gitops-pull-secret"
 
-  gitops_config = module.gitops.gitops_config
-  git_credentials = module.gitops.git_credentials
-  server_name = module.gitops.server_name
-  namespace = module.gitops_namespace.name
-  kubeseal_cert = module.gitops.sealed_secrets_cert
+  gitops_config = var.gitops_config
+  git_credentials = var.git_credentials
+  server_name = var.server_name
+  namespace = var.namespace
+  kubeseal_cert = var.kubeseal_cert
   docker_server = "cp.icr.io"
   docker_username = "cp"
   docker_password = var.entitlementkey
+  secret_name = "ibm-entitlement"
 }
 
+/*
 # Update MAS Core CRD
 
 resource null_resource update_coreCRD {
@@ -65,7 +68,7 @@ resource null_resource update_coreCRD {
       BIN_DIR = local.bin_dir
     }
   }
-} 
+}  */
 
 
 # Deploy truststore manager
@@ -79,9 +82,10 @@ resource null_resource update_coreCRD {
 # Install IBM Maximo Application Suite operator
 
 resource "null_resource" "deployMASop" {
+  depends_on = [module.add_entitlement]
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.instanceid} ${var.versionid}"
+    command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${var.namespace}'"
 
     environment = {
       KUBECONFIG = self.triggers.kubeconfig
@@ -92,11 +96,8 @@ resource "null_resource" "deployMASop" {
 
 # Install IBM Maximo Application Suite core systems
 
-
-/* don't run yet
-
 resource null_resource setup_gitops {
-  depends_on = [null_resource.patch_sbo]
+  depends_on = [null_resource.patch_sbo,null_resource.deployMASop]
 
   provisioner "local-exec" {
     command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
@@ -106,4 +107,4 @@ resource null_resource setup_gitops {
       GITOPS_CONFIG   = yamlencode(var.gitops_config)
     }
   }
-}  */
+}  

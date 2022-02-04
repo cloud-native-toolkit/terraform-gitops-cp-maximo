@@ -42,7 +42,6 @@ versions:
         moduleRef:
           id: gitops
           output: sealed_secrets_cert
-                - name: kubeseal_cert
       - name: cluster_ingress  
         moduleRef:
           id: ocp-login
