@@ -15,7 +15,7 @@ mkdir -p "${DEST_DIR}"
 
 echo "adding mas subscription chart..."
 
-cat > "${DEST_DIR}/my-ibm-mas-${VERSION}.yaml" << EOL
+cat > "${DEST_DIR}/ibm-mas-op.yaml" << EOL
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
