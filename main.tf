@@ -5,6 +5,8 @@ locals {
 
   layer = "services"
   application_branch = "main"
+  type  = "base"
+  namespace = var.namespace
   layer_config = var.gitops_config[local.layer]
 }
 
