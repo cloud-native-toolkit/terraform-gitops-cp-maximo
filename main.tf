@@ -90,7 +90,7 @@ resource "null_resource" "deployMASop" {
     command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${var.namespace}'"
 
     environment = {
-      KUBECONFIG = self.triggers.kubeconfig
+      BIN_DIR = local.bin_dir
     }
   }
 
