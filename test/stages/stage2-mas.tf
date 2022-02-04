@@ -6,6 +6,7 @@ module "mas_appsuite" {
   server_name = module.gitops.server_name
   namespace = module.gitops_namespace.name
   kubeseal_cert = module.gitops.sealed_secrets_cert
+  entitlementkey = var.cp_entitlement_key
   versionid = "8.5.x"
   instanceid = "mas85"
   
