@@ -110,3 +110,4 @@ resource null_resource setup_gitops {
     }
   }
 }  
+
