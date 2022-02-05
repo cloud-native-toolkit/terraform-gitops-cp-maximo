@@ -32,6 +32,19 @@ module "service_account" {
   rbac_cluster_scope = false
 }
 
+
+module "gitops_cp_catalogs" {
+  source = "github.com/cloud-native-toolkit/terraform-gitops-cp-catalogs"
+
+  entitlement_key = var.entitlementkey
+  gitops_config = var.gitops_config
+  git_credentials = var.git_credentials
+  server_name = var.server_name
+  kubeseal_cert = var.kubeseal_cert
+
+}
+
+
 resource null_resource patch_sbo {
   depends_on = [module.service_account]
 
@@ -84,7 +97,7 @@ resource null_resource update_coreCRD {
 # Install IBM Maximo Application Suite operator
 
 resource "null_resource" "deployMASop" {
-  depends_on = [module.add_entitlement]
+  depends_on = [module.add_entitlement, module.gitops_cp_catalogs]
 
   provisioner "local-exec" {
     command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${var.namespace}'"
