@@ -1,5 +1,5 @@
 locals {
-  name          = "ibm_max"
+  name          = "maximo"
   bin_dir       = module.setup_clis.bin_dir
   yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
 

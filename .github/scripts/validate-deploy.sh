@@ -16,7 +16,7 @@ SERVER_NAME="default"
 TYPE="base"
 LAYER="2-services"
 
-COMPONENT_NAME="ibm_max"
+COMPONENT_NAME="maximo"
 
 
 mkdir -p .testrepo
@@ -60,7 +60,7 @@ fi
 #wait for deployment
 sleep 10m
 
-## add deplopyment check
+## add deplopyment check for mas operator here
 
 
 #DEPLOYMENT="${COMPONENT_NAME}-${BRANCH}"
