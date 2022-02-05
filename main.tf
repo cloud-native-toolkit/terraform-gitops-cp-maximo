@@ -106,7 +106,7 @@ resource null_resource setup_gitops {
 
     environment = {
       GIT_CREDENTIALS = yamlencode(nonsensitive(var.git_credentials))
-      GITOPS_CONFIG   = yamlencode(var.gitops_config)
+      GITOPS_CONFIG   = yamlencode(nonsensitive(var.gitops_config))
     }
   }
 }  
