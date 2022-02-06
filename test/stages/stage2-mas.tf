@@ -8,7 +8,7 @@ module "mas_appsuite" {
   kubeseal_cert = module.gitops.sealed_secrets_cert
   entitlementkey = var.cp_entitlement_key
   cluster_ingress = module.dev_cluster.platform.ingress
-  versionid = "8.5.x"
-  instanceid = "mas85"
+  versionid = "8.x"
+  instanceid = "mas86"
   
 }
