@@ -19,8 +19,6 @@ module setup_clis {
 # Install IBM Maximo Application Suite operator
 
 resource "null_resource" "deployMASop" {
-  depends_on = [module.add_entitlement, module.gitops_cp_catalogs]
-
   provisioner "local-exec" {
     command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${var.namespace}'"
 
@@ -28,11 +26,10 @@ resource "null_resource" "deployMASop" {
       BIN_DIR = local.bin_dir
     }
   }
-
 }
 
 resource null_resource setup_gitops_op {
-  depends_on = [null_resource.patch_sbo,null_resource.deployMASop]
+  depends_on = [null_resource.deployMASop]
 
   provisioner "local-exec" {
     command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
@@ -58,7 +55,6 @@ resource "null_resource" "deployMASSuite" {
   }
 
 }
-
 
 resource null_resource setup_gitops_suite {
   depends_on = [null_resource.deployMASSuite]
