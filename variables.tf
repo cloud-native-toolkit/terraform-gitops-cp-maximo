@@ -92,7 +92,7 @@ variable "cluster_ingress" {
 variable "instanceid" {
   type        = string
   description = "instance ID for MAS - must match format: mas85 / mas86 "
-  default     = "mas85"
+  default     = "mas86"
 }
 
 variable "versionid" {
@@ -101,4 +101,13 @@ variable "versionid" {
   default     = "8.x"
 }
 
+variable "catalog_name" {
+  type        = string
+  description = "Name of the IBM Operator OpenShift Catalog that contains MAS"
+}
 
+variable "certmgr_namespace" {
+  type        = string
+  description = "Namespace of the cert-manager"
+  default     = "cert-manager"
+}

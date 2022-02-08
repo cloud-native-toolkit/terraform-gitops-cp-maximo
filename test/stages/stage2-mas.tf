@@ -6,9 +6,11 @@ module "mas_appsuite" {
   server_name = module.gitops.server_name
   namespace = module.gitops_namespace.name
   kubeseal_cert = module.gitops.sealed_secrets_cert
-  entitlementkey = var.cp_entitlement_key
+  entitlementkey = module.catalog.entitlement_key
   cluster_ingress = module.dev_cluster.platform.ingress
+  catalog_name = module.catalog.catalog_ibmoperators
   versionid = "8.x"
   instanceid = "mas86"
-  
+  certmgr_namespace = "cert-manager"
+
 }

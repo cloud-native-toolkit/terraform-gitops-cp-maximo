@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
-#SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
-#MAS_DIR=$(cd "${SCRIPT_DIR}/../charts/mas"; pwd -P)
-
-#ICR_CPOPEN="${ICR_CPOPEN:-icr.io/cpopen}"
 
 DEST_DIR="$1"
-#INSTANCE_ID="$2"
 VERSION="$2"
 NAMESP="$3"
 
