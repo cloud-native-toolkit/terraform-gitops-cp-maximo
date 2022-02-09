@@ -7,7 +7,7 @@ module "mas_appsuite" {
   namespace = module.gitops_namespace.name
   kubeseal_cert = module.gitops.sealed_secrets_cert
   entitlementkey = module.catalog.entitlement_key
-  cluster_ingress = module.dev_cluster.platform.ingress
+  cluster_ingress = "toolkit-dev-ocp48-gitops-2ab66b053c14936810608de9a1deac9c-0000.us-east.containers.appdomain.cloud"
   catalog_name = module.catalog.catalog_ibmoperators
   versionid = "8.x"
   instanceid = "mas86"

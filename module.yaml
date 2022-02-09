@@ -12,11 +12,7 @@ versions:
       - id: gitops
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
-            version: ">= 1.1.0"
-      - id: ocp-login
-        refs:
-          - source: github.com/cloud-native-toolkit/terraform-ocp-login.git
-            version: ">= 1.0.0"      
+            version: ">= 1.1.0"   
       - id: namespace
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
@@ -50,10 +46,6 @@ versions:
         moduleRef:
           id: gitops
           output: sealed_secrets_cert
-      - name: cluster_ingress  
-        moduleRef:
-          id: ocp-login
-          output: platform.ingress
       - name: entitlementkey  
         moduleRef:
           id: catalog
