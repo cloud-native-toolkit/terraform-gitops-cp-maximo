@@ -43,7 +43,7 @@ resource "null_resource" "deployMASSuite" {
 
 }
 
-resource null_resource setup_gitops_op {
+resource null_resource setup_gitops {
   depends_on = [null_resource.deployMASSuite]
 
   provisioner "local-exec" {
