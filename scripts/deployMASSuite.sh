@@ -22,7 +22,7 @@ metadata:
   labels:
     mas.ibm.com/instanceId: ${INSTID}
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   certManagerNamespace: ${CERTNMSP}
   domain: ${DOMAIN}

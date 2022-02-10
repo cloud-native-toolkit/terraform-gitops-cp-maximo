@@ -14,15 +14,15 @@ cat > "${DEST_DIR}/ibm-mas-op.yaml" << EOL
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: ibm-mas-operator
+  name: ibm-mas
   namespace: ${NAMESP}
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   channel: ${VERSION}
   installPlanApproval: Automatic
   name: ibm-mas
   source: ibm-operator-catalog
-  sourceNamespace: openshift-marketplace  
+  sourceNamespace: openshift-marketplace
 EOL
 
