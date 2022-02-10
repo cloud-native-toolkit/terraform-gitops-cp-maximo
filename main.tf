@@ -28,8 +28,23 @@ resource "null_resource" "deployMASop" {
   }
 }
 
+# Install IBM Maximo Application Suite core systems
+
+resource "null_resource" "deployMASSuite" {
+  depends_on = [null_resource.setup_gitops_op]
+
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/deployMASSuite.sh '${local.yaml_dir}' ${var.instanceid} '${var.namespace}' '${var.cluster_ingress}' '${var.certmgr_namespace}' "
+
+    environment = {
+      BIN_DIR = local.bin_dir
+    }
+  }
+
+}
+
 resource null_resource setup_gitops_op {
-  depends_on = [null_resource.deployMASop]
+  depends_on = [null_resource.deployMASop,null_resource.deployMASSuite]
 
   provisioner "local-exec" {
     command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
@@ -41,21 +56,8 @@ resource null_resource setup_gitops_op {
   }
 }  
 
-# Install IBM Maximo Application Suite core systems
 
-resource "null_resource" "deployMASSuite" {
-  depends_on = [null_resource.setup_gitops_op]
-
-  provisioner "local-exec" {
-    command = "${path.module}/scripts/deployMASSuite.sh '${local.inst_dir}' ${var.instanceid} '${var.namespace}' '${var.cluster_ingress}' '${var.certmgr_namespace}' "
-
-    environment = {
-      BIN_DIR = local.bin_dir
-    }
-  }
-
-}
-
+/*
 resource null_resource setup_gitops_suite {
   depends_on = [null_resource.deployMASSuite]
 
@@ -67,4 +69,4 @@ resource null_resource setup_gitops_suite {
       GITOPS_CONFIG   = yamlencode(var.gitops_config)
     }
   }
-} 
+} */
