@@ -28,7 +28,7 @@ resource "null_resource" "deployMASop" {
   }
 }
 
-# Install IBM Maximo Application Suite core systems
+# Install IBM Maximo Application Suite core system instance
 
 resource "null_resource" "deployMASSuite" {
   depends_on = [null_resource.deployMASop]
@@ -40,7 +40,6 @@ resource "null_resource" "deployMASSuite" {
       BIN_DIR = local.bin_dir
     }
   }
-
 }
 
 resource null_resource setup_gitops_op {

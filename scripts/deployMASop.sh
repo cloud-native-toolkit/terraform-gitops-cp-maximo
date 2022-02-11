@@ -24,6 +24,4 @@ spec:
   name: ibm-mas
   source: ibm-operator-catalog
   sourceNamespace: openshift-marketplace
-  startingCSV: ibm-mas.v8.6.1
 EOL
-
