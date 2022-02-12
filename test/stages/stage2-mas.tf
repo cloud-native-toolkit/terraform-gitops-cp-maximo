@@ -12,6 +12,6 @@ module "mas_appsuite" {
   catalog_name = module.catalog.catalog_ibmoperators
   certmgr_namespace = module.certmgr.namespace
   versionid = "8.x"
-  instanceid = "mas86"
+  instanceid = "mas8"
 
 }

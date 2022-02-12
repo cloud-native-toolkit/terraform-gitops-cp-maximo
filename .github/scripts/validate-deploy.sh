@@ -58,7 +58,7 @@ else
   sleep 30
 fi
 #wait for deployment
-sleep 10m
+sleep 5m
 
 # deplopyment check for mas operator
 
@@ -73,14 +73,14 @@ kubectl rollout status "deployment/ibm-mas-operator" -n "${NAMESPACE}" || exit 1
 
 # instance check
 
-#count=0
-#until kubectl get deployment mas86-coreidp-login -n ${NAMESPACE} || [[ $count -eq 20 ]]; do
-#  echo "Waiting for deployment/mas86-coreidp-login in ${NAMESPACE}"
-#  count=$((count + 1))
-#  sleep 60
-#done
+count=0
+until kubectl get deployment mas86-coreidp-login -n ${NAMESPACE} || [[ $count -eq 20 ]]; do
+  echo "Waiting for deployment/mas86-coreidp-login in ${NAMESPACE}"
+  count=$((count + 1))
+  sleep 60
+done
 
-#kubectl rollout status "deployment/mas86-coreidp-login" -n "${NAMESPACE}" || exit 1
+kubectl rollout status "deployment/mas86-coreidp-login" -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo
