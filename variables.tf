@@ -91,7 +91,7 @@ variable "cluster_ingress" {
 
 variable "instanceid" {
   type        = string
-  description = "instance ID for MAS - must match format: mas85 / mas86 "
+  description = "instance ID for MAS - for example: masdemo or mas8 "
   default     = "mas8"
 }
 

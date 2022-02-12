@@ -74,13 +74,13 @@ kubectl rollout status "deployment/ibm-mas-operator" -n "${NAMESPACE}" || exit 1
 # instance check
 
 count=0
-until kubectl get deployment mas86-coreidp-login -n ${NAMESPACE} || [[ $count -eq 20 ]]; do
-  echo "Waiting for deployment/mas86-coreidp-login in ${NAMESPACE}"
+until kubectl get deployment mas8-coreidp-login -n ${NAMESPACE} || [[ $count -eq 20 ]]; do
+  echo "Waiting for deployment/mas8-coreidp-login in ${NAMESPACE}"
   count=$((count + 1))
   sleep 60
 done
 
-kubectl rollout status "deployment/mas86-coreidp-login" -n "${NAMESPACE}" || exit 1
+kubectl rollout status "deployment/mas8-coreidp-login" -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo
