@@ -19,11 +19,6 @@ variable "bootstrap_prefix" {
   default = ""
 }
 
-variable "namespace" {
-  type        = string
-  description = "Namespace for tools"
-}
-
 variable "cluster_name" {
   type        = string
   description = "The name of the cluster"
@@ -80,4 +75,15 @@ variable "gitops_namespace" {
 }
 
 variable "git_username" {
+}
+
+variable "cp_entitlement_key" {
+}
+
+variable "kubeseal_namespace" {
+  default = "sealed-secrets"
+}
+
+variable "ingress_subdomain" {
+  default = ""
 }

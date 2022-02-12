@@ -1,23 +1,28 @@
-name: ""
+name: "gitops-cp-maximo"
 type: gitops
-description: ""
+description: "IBM Maximo Application Suite"
 tags:
-  - tools
   - gitops
 versions:
   - platforms:
-      - kubernetes
-      - ocp3
       - ocp4
     dependencies:
       - id: gitops
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
-            version: ">= 1.1.0"
+            version: ">= 1.1.0"   
       - id: namespace
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
             version: ">= 1.0.0"
+      - id: catalog
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-cp-catalogs.git
+            version: ">= 1.0.0"  
+      - id: certmgr
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-ocp-cert-manager.git
+            version: ">= 1.2.1"                   
     variables:
       - name: gitops_config
         moduleRef:
@@ -39,3 +44,15 @@ versions:
         moduleRef:
           id: gitops
           output: sealed_secrets_cert
+      - name: entitlementkey  
+        moduleRef:
+          id: catalog
+          output: entitlement_key
+      - name: catalog_name  
+        moduleRef:
+          id: catalog
+          output: catalog_ibmoperators
+      - name: certmgr_namespace  
+        moduleRef:
+          id: certmgr
+          output: namespace

@@ -78,3 +78,36 @@ variable "server_name" {
   description = "The name of the server"
   default     = "default"
 }
+
+variable "entitlementkey" {
+  type        = string
+  description = "IBM entitlement key for MAS"
+}
+
+variable "cluster_ingress" {
+  type        = string
+  description = "Ingress for cluster"
+}
+
+variable "instanceid" {
+  type        = string
+  description = "instance ID for MAS - for example: masdemo or mas8 "
+  default     = "mas8"
+}
+
+variable "versionid" {
+  type        = string
+  description = "version for MAS - this must match the update channel: 8.x for latest, or 8.5.x / 8.6.x etc."
+  default     = "8.x"
+}
+
+variable "catalog_name" {
+  type        = string
+  description = "Name of the IBM Operator OpenShift Catalog that contains MAS"
+}
+
+variable "certmgr_namespace" {
+  type        = string
+  description = "Namespace of the cert-manager"
+  default     = "cert-manager"
+}
