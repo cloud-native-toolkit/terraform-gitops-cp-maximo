@@ -4,7 +4,7 @@ module "mas_appsuite" {
   gitops_config = module.gitops.gitops_config
   git_credentials = module.gitops.git_credentials
   server_name = module.gitops.server_name
-  namespace = module.gitops_namespace.name
+
   kubeseal_cert = module.gitops.sealed_secrets_cert
   entitlementkey = module.catalog.entitlement_key
   cluster_ingress = module.dev_cluster.platform.ingress
@@ -14,4 +14,10 @@ module "mas_appsuite" {
   versionid = "8.x"
   instanceid = "mas8"
 
+}
+
+resource null_resource write_namespace {
+  provisioner "local-exec" {
+    command = "echo -n 'mas-mas8-core' > .namespace"
+  }
 }

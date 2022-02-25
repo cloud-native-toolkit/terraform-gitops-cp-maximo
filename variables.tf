@@ -62,11 +62,6 @@ variable "git_credentials" {
   description = "The credentials for the gitops repo(s)"
 }
 
-variable "namespace" {
-  type        = string
-  description = "The namespace where the application should be deployed"
-}
-
 variable "kubeseal_cert" {
   type        = string
   description = "The certificate/public key used to encrypt the sealed secrets"
@@ -91,8 +86,7 @@ variable "cluster_ingress" {
 
 variable "instanceid" {
   type        = string
-  description = "instance ID for MAS - for example: masdemo or mas8 "
-  default     = "mas8"
+  description = "instance name for MAS - for example: masdemo or mas8 "
 }
 
 variable "versionid" {

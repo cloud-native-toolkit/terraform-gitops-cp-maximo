@@ -7,7 +7,7 @@ locals {
   layer = "services"
   application_branch = "main"
   type  = "base"
-  namespace = var.namespace
+  namespace = "mas-${var.instanceid}-core"
   layer_config = var.gitops_config[local.layer]
 }
 
@@ -15,12 +15,42 @@ module setup_clis {
   source = "github.com/cloud-native-toolkit/terraform-util-clis.git"
 }
 
+# Create the namespace and pullsecret needed for MAS
+
+module masNamespace {
+  source = "github.com/cloud-native-toolkit/terraform-gitops-namespace.git"
+
+  gitops_config = var.gitops_config
+  git_credentials = var.git_credentials
+  name = "${local.namespace}"
+  create_operator_group = true
+}
+
+module "pullsecret" {
+  depends_on = [module.masNamespace]
+
+  source = "github.com/cloud-native-toolkit/terraform-gitops-pull-secret.git"
+
+  gitops_config = var.gitops_config
+  git_credentials = var.git_credentials
+  server_name = var.server_name
+  kubeseal_cert = var.kubeseal_cert
+  
+  namespace = module.masNamespace.name
+  docker_server = "cp.icr.io"
+  docker_username = "cp"
+  docker_password = var.entitlementkey
+  secret_name = "ibm-entitlement"
+}
+
 
 # Install IBM Maximo Application Suite operator
 
 resource "null_resource" "deployMASop" {
+  depends_on = [module.pullsecret]
+
   provisioner "local-exec" {
-    command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${var.namespace}'"
+    command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${local.namespace}'"
 
     environment = {
       BIN_DIR = local.bin_dir
@@ -34,7 +64,7 @@ resource "null_resource" "deployMASSuite" {
   depends_on = [null_resource.deployMASop]
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/deployMASSuite.sh '${local.inst_dir}' ${var.instanceid} '${var.namespace}' '${var.cluster_ingress}' '${var.certmgr_namespace}' "
+    command = "${path.module}/scripts/deployMASSuite.sh '${local.inst_dir}' ${var.instanceid} '${local.namespace}' '${var.cluster_ingress}' '${var.certmgr_namespace}' "
 
     environment = {
       BIN_DIR = local.bin_dir
@@ -46,7 +76,7 @@ resource null_resource setup_gitops_op {
   depends_on = [null_resource.deployMASop]
 
   provisioner "local-exec" {
-    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
+    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${local.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
 
     environment = {
       GIT_CREDENTIALS = yamlencode(nonsensitive(var.git_credentials))
@@ -60,7 +90,7 @@ resource null_resource setup_gitops_suite {
   depends_on = [null_resource.deployMASSuite,null_resource.setup_gitops_op]
 
   provisioner "local-exec" {
-    command = "${local.bin_dir}/igc gitops-module 'maximosuite' -n '${var.namespace}' --contentDir '${local.inst_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
+    command = "${local.bin_dir}/igc gitops-module 'maximosuite' -n '${local.namespace}' --contentDir '${local.inst_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
 
     environment = {
       GIT_CREDENTIALS = yamlencode(nonsensitive(var.git_credentials))
