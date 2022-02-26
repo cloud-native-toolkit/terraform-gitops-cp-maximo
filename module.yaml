@@ -14,11 +14,7 @@ versions:
       - id: catalog
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-cp-catalogs.git
-            version: ">= 1.0.0"  
-      - id: certmgr
-        refs:
-          - source: github.com/cloud-native-toolkit/terraform-gitops-ocp-cert-manager.git
-            version: ">= 1.2.1"                   
+            version: ">= 1.0.0"                 
     variables:
       - name: gitops_config
         moduleRef:
@@ -44,7 +40,4 @@ versions:
         moduleRef:
           id: catalog
           output: catalog_ibmoperators
-      - name: certmgr_namespace  
-        moduleRef:
-          id: certmgr
-          output: namespace
+

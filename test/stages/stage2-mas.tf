@@ -10,7 +10,7 @@ module "mas_appsuite" {
   cluster_ingress = module.dev_cluster.platform.ingress
 
   catalog_name = module.catalog.catalog_ibmoperators
-  certmgr_namespace = module.certmgr.namespace
+
   versionid = "8.x"
   instanceid = "mas8"
 

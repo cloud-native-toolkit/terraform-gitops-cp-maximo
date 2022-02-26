@@ -91,7 +91,7 @@ variable "instanceid" {
 
 variable "versionid" {
   type        = string
-  description = "version for MAS - this must match the update channel: 8.x for latest, or 8.5.x / 8.6.x etc."
+  description = "version for MAS - this must match the update channel: 8.x for latest"
   default     = "8.x"
 }
 
@@ -102,6 +102,6 @@ variable "catalog_name" {
 
 variable "certmgr_namespace" {
   type        = string
-  description = "Namespace of the cert-manager"
-  default     = "cert-manager"
+  description = "Namespace of the cert-manager: should stay default value unless using another cert manager"
+  default     = "ibm-common-services"
 }
