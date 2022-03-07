@@ -38,7 +38,14 @@ module "mas_appsuite" {
   cluster_ingress = module.dev_cluster.platform.ingress
   catalog_name = module.catalog.catalog_ibmoperators
   instanceid = "mas8"
-  certmgr_namespace = "cert-manager"
+  certmgr_namespace = "ibm-common-services"
 
 }
 ```
+
+## Cleanup
+
+Note:  Some items may not be completely removed by simply uninstalling the operator and instance.  For this a cleanup script has been provided in the cleanup directory of this repository.  Obtain a login token from the OpenShift instance then run the script:
+
+`./mas-clean.sh <instance namespace> <bas namespace> <sls namespace> <mongo namespace>`
+
