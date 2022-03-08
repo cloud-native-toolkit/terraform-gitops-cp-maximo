@@ -38,7 +38,9 @@ oc delete application openshift-marketplace-ibm-entitlement-key -n openshift-git
 # remove core
 oc delete suite ${SUITENAME} -n ${NAMESPACE}
 oc delete csv ibm-mas.v8.7.0 -n ${NAMESPACE}
-oc delete namespace ${NAMESPACE}
+
+#remove mongo
+oc delete deployment mongodb-kubernetes-operator -n ${MONGONAME}
 
 #remove bas
 oc delete AnalyticsProxy ${SUITENAME} -n ${BASNAME}
@@ -57,11 +59,6 @@ oc delete deployment kafka-entity-operator -n ${BASNAME}
 oc delete deployment postgres-operator -n ${BASNAME}
 oc delete deployment simple-reverse-proxy -n ${BASNAME}
 oc delete deployment store-api-deployment -n ${BASNAME}
-oc delete namespace ${BASNAME}
-
-#remove mongo
-oc delete deployment mongodb-kubernetes-operator -n ${MONGONAME}
-oc delete namespace ${MONGONAME}
 
 #remove ibm common services
 oc delete operandconfig common-service -n ibm-common-services
@@ -92,7 +89,7 @@ oc get crd -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep cer
 #remove sls
 oc delete licenseservice sls -n ${SLSNAME}
 oc delete csv ibm-sls.v3.3.0 -n ${SLSNAME}
-oc delete namespace ${SLSNAME}
+
 
 #remove jet stack cert-manager if used
 #oc delete deployment cert-manager -n cert-manager
@@ -100,5 +97,9 @@ oc delete namespace ${SLSNAME}
 #oc delete deployment cert-manager-webhook -n cert-manager
 #oc delete namespace cert-manager
 
-#remove is namespace
+#remove namespaces
+oc delete namespace ${MONGONAME}
+oc delete namespace ${BASNAME}
+oc delete namespace ${SLSNAME}
 oc delete namespace ibm-common-services
+oc delete namespace ${NAMESPACE}
