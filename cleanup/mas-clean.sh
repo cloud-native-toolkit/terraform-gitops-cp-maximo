@@ -35,31 +35,6 @@ oc delete application namespace-mongo -n openshift-gitops
 oc delete application openshift-marketplace-ibm-catalogs -n openshift-gitops
 oc delete application openshift-marketplace-ibm-entitlement-key -n openshift-gitops
 
-# remove core
-oc delete suite ${SUITENAME} -n ${NAMESPACE}
-oc delete csv ibm-mas.v8.7.0 -n ${NAMESPACE}
-
-#remove mongo
-oc delete deployment mongodb-kubernetes-operator -n ${MONGONAME}
-
-#remove bas
-oc delete AnalyticsProxy ${SUITENAME} -n ${BASNAME}
-oc delete GenerateKey bas-api-key -n ${BASNAME}
-oc delete Dashboard dashboard -n ${BASNAME}
-oc delete csv behavior-analytics-services-operator-certified.v1.1.4 -n ${BASNAME}
-
-oc delete deployment amq-streams-cluster-operator-v1.7.3 -n ${BASNAME}
-
-oc delete deployment event-api-deployment -n ${BASNAME}
-oc delete deployment event-reader-deployment -n ${BASNAME}
-oc delete deployment grafana-deployment -n ${BASNAME}
-oc delete deployment instrumentationdb -n ${BASNAME}
-oc delete deployment instrumentationdb-backrest-shared-repo -n ${BASNAME}
-oc delete deployment kafka-entity-operator -n ${BASNAME}
-oc delete deployment postgres-operator -n ${BASNAME}
-oc delete deployment simple-reverse-proxy -n ${BASNAME}
-oc delete deployment store-api-deployment -n ${BASNAME}
-
 #remove ibm common services
 oc delete operandconfig common-service -n ibm-common-services
 oc delete operand registry common-service -n ibm-common-services
@@ -81,6 +56,52 @@ oc delete ValidatingWebhookConfiguration cert-manager-webhook ibm-cs-ns-mapping-
 oc delete MutatingWebhookConfiguration cert-manager-webhook ibm-common-service-webhook-configuration ibm-operandrequest-webhook-configuration namespace-admission-config --ignore-not-found
 oc delete namespace services
 oc delete nss --all
+
+# remove core
+oc delete suite ${SUITENAME} -n ${NAMESPACE}
+oc delete csv ibm-mas.v8.7.1 -n ${NAMESPACE}
+
+# remove truststore and dependencies
+oc delete csv ibm-truststore-mgr.v1.2.2 -n ${NAMESPACE}
+oc delete truststore ${SUITENAME}-truststore -n ${NAMESPACE}
+
+# In the case that Kubernetes hangs on truststore instances, set the finalizer to null which will force delete, issue with operator
+resp=$(kubectl get truststore/${SUITENAME}-truststore -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
+
+if [[ "${resp}" != "0" ]]; then
+    echo "patching truststore..."
+    kubectl patch truststore/${SUITENAME}-truststore -p '{"metadata":{"finalizers":[]}}' --type=merge -n ${NAMESPACE} 2>/dev/null
+fi
+
+oc delete truststore ${SUITENAME}-coreidp-truststore -n ${NAMESPACE}
+resp=$(kubectl get truststore/${SUITENAME}-coreidp-truststore -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
+
+if [[ "${resp}" != "0" ]]; then
+    echo "patching truststore..."
+    kubectl patch truststore/${SUITENAME}-coreidp-truststore -p '{"metadata":{"finalizers":[]}}' --type=merge -n ${NAMESPACE} 2>/dev/null
+fi
+
+
+#remove mongo
+oc delete deployment mongodb-kubernetes-operator -n ${MONGONAME}
+
+#remove bas
+oc delete AnalyticsProxy ${SUITENAME} -n ${BASNAME}
+oc delete GenerateKey bas-api-key -n ${BASNAME}
+oc delete Dashboard dashboard -n ${BASNAME}
+oc delete csv behavior-analytics-services-operator-certified.v1.1.4 -n ${BASNAME}
+
+oc delete deployment amq-streams-cluster-operator-v1.7.3 -n ${BASNAME}
+
+oc delete deployment event-api-deployment -n ${BASNAME}
+oc delete deployment event-reader-deployment -n ${BASNAME}
+oc delete deployment grafana-deployment -n ${BASNAME}
+oc delete deployment instrumentationdb -n ${BASNAME}
+oc delete deployment instrumentationdb-backrest-shared-repo -n ${BASNAME}
+oc delete deployment kafka-entity-operator -n ${BASNAME}
+oc delete deployment postgres-operator -n ${BASNAME}
+oc delete deployment simple-reverse-proxy -n ${BASNAME}
+oc delete deployment store-api-deployment -n ${BASNAME}
 
 # remove crd's
 oc get crd -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep ibm.com | while read crd; do oc delete "crd/$crd"; done
