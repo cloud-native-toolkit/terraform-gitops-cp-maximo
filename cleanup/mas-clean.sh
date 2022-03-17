@@ -58,7 +58,15 @@ oc delete namespace services
 oc delete nss --all
 
 # remove core
-oc delete suite ${SUITENAME} -n ${NAMESPACE}
+oc delete suite ${SUITENAME} -n ${NAMESPACE} >/dev/null 2>&1 &
+resp=$(kubectl get suite/${SUITENAME} -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
+
+if [[ "${resp}" != "0" ]]; then
+    echo "patching suite..."
+    kubectl patch suite/${SUITENAME} -p '{"metadata":{"finalizers":[]}}' --type=merge -n ${NAMESPACE} 2>/dev/null
+fi
+
+
 oc delete csv ibm-mas.v8.7.1 -n ${NAMESPACE}
 
 # remove truststore and dependencies
