@@ -63,7 +63,7 @@ oc delete csv ibm-mas.v8.7.1 -n ${NAMESPACE}
 
 # remove truststore and dependencies
 oc delete csv ibm-truststore-mgr.v1.2.2 -n ${NAMESPACE}
-oc delete truststore ${SUITENAME}-truststore -n ${NAMESPACE}
+oc delete truststore ${SUITENAME}-truststore -n ${NAMESPACE} >/dev/null 2>&1 &
 
 # In the case that Kubernetes hangs on truststore instances, set the finalizer to null which will force delete, issue with operator
 resp=$(kubectl get truststore/${SUITENAME}-truststore -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
@@ -73,7 +73,7 @@ if [[ "${resp}" != "0" ]]; then
     kubectl patch truststore/${SUITENAME}-truststore -p '{"metadata":{"finalizers":[]}}' --type=merge -n ${NAMESPACE} 2>/dev/null
 fi
 
-oc delete truststore ${SUITENAME}-coreidp-truststore -n ${NAMESPACE}
+oc delete truststore ${SUITENAME}-coreidp-truststore -n ${NAMESPACE} >/dev/null 2>&1 &
 resp=$(kubectl get truststore/${SUITENAME}-coreidp-truststore -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
 
 if [[ "${resp}" != "0" ]]; then
@@ -102,6 +102,32 @@ oc delete deployment kafka-entity-operator -n ${BASNAME}
 oc delete deployment postgres-operator -n ${BASNAME}
 oc delete deployment simple-reverse-proxy -n ${BASNAME}
 oc delete deployment store-api-deployment -n ${BASNAME}
+
+
+oc delete operandbindinfo ibm-licensing-bindinfo -n ibm-common-services >/dev/null 2>&1 &
+resp=$(kubectl get operandbindinfo/ibm-licensing-bindinfo -n ibm-common-services --no-headers 2>/dev/null | wc -l)
+
+if [[ "${resp}" != "0" ]]; then
+    echo "patching operandbinding..."
+    kubectl patch operandbindinfo/ibm-licensing-bindinfo -p '{"metadata":{"finalizers":[]}}' --type=merge -n ibm-common-services 2>/dev/null
+fi
+
+oc delete operandrequest common-service -n ${NAMESPACE} >/dev/null 2>&1 &
+resp=$(kubectl get operandrequest/ibm-licensing-bindinfo -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
+
+if [[ "${resp}" != "0" ]]; then
+    echo "patching operandrequest common-service..."
+    kubectl patch operandrequest/common-service -p '{"metadata":{"finalizers":[]}}' --type=merge -n ${NAMESPACE} 2>/dev/null
+fi
+
+oc delete operandrequest common-service-cert-manager -n ${NAMESPACE} >/dev/null 2>&1 &
+resp=$(kubectl get operandrequest/common-service-cert-manager -n ${NAMESPACE} --no-headers 2>/dev/null | wc -l)
+
+if [[ "${resp}" != "0" ]]; then
+    echo "patching operandrequestcommon-service-cert-manager..."
+    kubectl patch operandrequest/common-service-cert-manager -p '{"metadata":{"finalizers":[]}}' --type=merge -n ${NAMESPACE} 2>/dev/null
+fi
+
 
 # remove crd's
 oc get crd -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep ibm.com | while read crd; do oc delete "crd/$crd"; done
