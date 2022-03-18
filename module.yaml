@@ -32,12 +32,7 @@ versions:
         moduleRef:
           id: gitops
           output: sealed_secrets_cert
-      - name: entitlementkey  
-        moduleRef:
-          id: catalog
-          output: entitlement_key
       - name: catalog_name  
         moduleRef:
           id: catalog
           output: catalog_ibmoperators
-
