@@ -74,7 +74,7 @@ variable "server_name" {
   default     = "default"
 }
 
-variable "entitlementkey" {
+variable "entitlement_key" {
   type        = string
   description = "IBM entitlement key for MAS"
 }

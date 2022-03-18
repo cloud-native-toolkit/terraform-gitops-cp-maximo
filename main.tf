@@ -39,7 +39,7 @@ module "pullsecret" {
   namespace = module.masNamespace.name
   docker_server = "cp.icr.io"
   docker_username = "cp"
-  docker_password = var.entitlementkey
+  docker_password = var.entitlement_key
   secret_name = "ibm-entitlement"
 }
 
