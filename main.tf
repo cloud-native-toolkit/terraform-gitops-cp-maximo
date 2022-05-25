@@ -75,12 +75,34 @@ resource "null_resource" "deployMASSuite" {
 resource null_resource setup_gitops_op {
   depends_on = [null_resource.deployMASop]
 
+  triggers = {
+    name = local.name
+    namespace = local.namespace
+    yaml_dir = local.yaml_dir
+    server_name = var.server_name
+    layer = local.layer
+    type = local.type
+    git_credentials = yamlencode(var.git_credentials)
+    gitops_config   = yamlencode(var.gitops_config)
+    bin_dir = local.bin_dir
+  }
+
   provisioner "local-exec" {
-    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${local.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
+    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --debug"
 
     environment = {
-      GIT_CREDENTIALS = yamlencode(nonsensitive(var.git_credentials))
-      GITOPS_CONFIG   = yamlencode(var.gitops_config)
+      GIT_CREDENTIALS = yamlencode(nonsensitive(self.triggers.git_credentials))
+      GITOPS_CONFIG   = yamlencode(self.triggers.gitops_config)
+    }
+  }
+
+  provisioner "local-exec" {
+    when = destroy
+    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --delete --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
+
+    environment = {
+      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
+      GITOPS_CONFIG   = self.triggers.gitops_config
     }
   }
 }  
@@ -89,12 +111,34 @@ resource null_resource setup_gitops_op {
 resource null_resource setup_gitops_suite {
   depends_on = [null_resource.deployMASSuite,null_resource.setup_gitops_op]
 
+  triggers = {
+    name = local.name
+    namespace = local.namespace
+    inst_dir = local.inst_dir
+    server_name = var.server_name
+    layer = local.layer
+    type = local.type
+    git_credentials = yamlencode(var.git_credentials)
+    gitops_config   = yamlencode(var.gitops_config)
+    bin_dir = local.bin_dir
+  }
+
   provisioner "local-exec" {
-    command = "${local.bin_dir}/igc gitops-module 'maximosuite' -n '${local.namespace}' --contentDir '${local.inst_dir}' --serverName '${var.server_name}' -l '${local.layer}' --debug"
+    command = "${self.triggers.bin_dir}/igc gitops-module 'maximosuite' -n '${self.triggers.namespace}' --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --debug"
 
     environment = {
-      GIT_CREDENTIALS = yamlencode(nonsensitive(var.git_credentials))
-      GITOPS_CONFIG   = yamlencode(var.gitops_config)
+      GIT_CREDENTIALS = yamlencode(nonsensitive(self.triggers.git_credentials))
+      GITOPS_CONFIG   = yamlencode(self.triggers.gitops_config)
+    }
+  }
+
+  provisioner "local-exec" {
+    when = destroy
+    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --delete --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
+
+    environment = {
+      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
+      GITOPS_CONFIG   = self.triggers.gitops_config
     }
   }
 } 
