@@ -91,8 +91,8 @@ resource null_resource setup_gitops_op {
     command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
               
     environment = {
-      GIT_CREDENTIALS = yamlencode(nonsensitive(self.triggers.git_credentials))
-      GITOPS_CONFIG   = yamlencode(self.triggers.gitops_config)
+      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
+      GITOPS_CONFIG   = self.triggers.gitops_config
     }
   }
 
@@ -127,8 +127,8 @@ resource null_resource setup_gitops_suite {
     command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
 
     environment = {
-      GIT_CREDENTIALS = yamlencode(nonsensitive(self.triggers.git_credentials))
-      GITOPS_CONFIG   = yamlencode(self.triggers.gitops_config)
+      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
+      GITOPS_CONFIG   = self.triggers.gitops_config
     }
   }
 
