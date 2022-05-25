@@ -86,7 +86,8 @@ variable "cluster_ingress" {
 
 variable "instanceid" {
   type        = string
-  description = "instance name for MAS - for example: masdemo or mas8 "
+  description = "instance name for to use for MAS Suite"
+  default     = "masapps"
 }
 
 variable "versionid" {
