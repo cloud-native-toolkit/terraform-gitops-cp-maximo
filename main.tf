@@ -112,7 +112,7 @@ resource null_resource setup_gitops_suite {
   depends_on = [null_resource.deployMASSuite,null_resource.setup_gitops_op]
 
   triggers = {
-    name = local.name
+    name = "maximosuite"
     namespace = local.namespace
     inst_dir = local.inst_dir
     server_name = var.server_name
@@ -124,8 +124,8 @@ resource null_resource setup_gitops_suite {
   }
 
   provisioner "local-exec" {
-    command = "${self.triggers.bin_dir}/igc gitops-module 'maximosuite' -n '${self.triggers.namespace}' --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
-    
+    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
+
     environment = {
       GIT_CREDENTIALS = yamlencode(nonsensitive(self.triggers.git_credentials))
       GITOPS_CONFIG   = yamlencode(self.triggers.gitops_config)
