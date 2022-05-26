@@ -114,6 +114,142 @@ versions:
         description: Ingress for cluster
       - name: instanceid
         type: string
+        description: instance name for to use for MAS Suite
+        default: masapps
+        optional: true
+      - name: versionid
+        type: string
+        description: 'version for MAS - this must match the update channel: 8.x for latest'
+        default: 8.x
+        optional: true
+      - name: certmgr_namespace
+        type: string
+        description: 'Namespace of the cert-manager: should stay default value unless using another cert manager'
+        default: ibm-common-services
+        optional: true
+    version: v1.1.0
+    outputs:
+      - name: name
+        description: The name of the module
+      - name: branch
+        description: The branch where the module config has been placed
+      - name: namespace
+        description: The namespace where the module will be deployed
+      - name: server_name
+        description: The server where the module will be deployed
+      - name: layer
+        description: The layer where the module is deployed
+      - name: type
+        description: The type of module where the module is deployed
+  - platforms:
+      - ocp4
+    dependencies:
+      - id: gitops
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
+            version: ">= 1.1.0"
+      - id: catalog
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-cp-catalogs.git
+            version: ">= 1.0.0"
+    variables:
+      - name: gitops_config
+        moduleRef:
+          id: gitops
+          output: gitops_config
+        type: |-
+          object({
+              boostrap = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              infrastructure = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              services = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+              applications = object({
+                argocd-config = object({
+                  project = string
+                  repo = string
+                  url = string
+                  path = string
+                })
+                payload = object({
+                  repo = string
+                  url = string
+                  path = string
+                })
+              })
+            })
+        description: Config information regarding the gitops repo structure
+      - name: git_credentials
+        moduleRef:
+          id: gitops
+          output: git_credentials
+        type: |-
+          list(object({
+              repo = string
+              url = string
+              username = string
+              token = string
+            }))
+        description: The credentials for the gitops repo(s)
+      - name: server_name
+        moduleRef:
+          id: gitops
+          output: server_name
+        type: string
+        description: The name of the server
+        default: default
+        optional: true
+      - name: kubeseal_cert
+        moduleRef:
+          id: gitops
+          output: sealed_secrets_cert
+        type: string
+        description: The certificate/public key used to encrypt the sealed secrets
+        default: ""
+        optional: true
+      - name: catalog_name
+        moduleRef:
+          id: catalog
+          output: catalog_ibmoperators
+        type: string
+        description: Name of the IBM Operator OpenShift Catalog that contains MAS
+      - name: entitlement_key
+        type: string
+        description: IBM entitlement key for MAS
+      - name: cluster_ingress
+        type: string
+        description: Ingress for cluster
+      - name: instanceid
+        type: string
         description: 'instance name for MAS - for example: masdemo or mas8 '
       - name: versionid
         type: string
