@@ -84,3 +84,6 @@ kubectl rollout status "deployment/mas8-coreidp-login" -n "${NAMESPACE}" || exit
 
 cd ..
 rm -rf .testrepo
+
+kubectl patch -n mas-mas8-core "suite/mas8" --type json --patch='[ { "op": "remove", "path": "/metadata/finalizers" } ]'
+suite.core.mas.ibm.com/mas8 patched
