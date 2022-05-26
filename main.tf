@@ -107,7 +107,6 @@ resource null_resource setup_gitops_op {
   }
 }  
 
-
 resource null_resource setup_gitops_suite {
   depends_on = [null_resource.deployMASSuite,null_resource.setup_gitops_op]
 
