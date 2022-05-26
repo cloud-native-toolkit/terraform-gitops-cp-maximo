@@ -84,3 +84,4 @@ kubectl rollout status "deployment/mas8-coreidp-login" -n "${NAMESPACE}" || exit
 
 cd ..
 rm -rf .testrepo
+
