@@ -97,7 +97,7 @@ resource "null_resource" "deployInstance" {
 
 # Deploy Operator
 resource gitops_module masapp_operator {
-  depends_on = [null_resource.deployOperator]
+  depends_on = [null_resource.deployOperator,module.masNamespace,module.pullsecret]
 
   name        = local.operator_name
   namespace   = local.core-namespace
