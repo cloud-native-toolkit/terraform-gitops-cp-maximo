@@ -25,10 +25,6 @@ locals {
           cluster_ingress = var.cluster_ingress
           admin_link = local.admin_link
         }
-        workspace = {
-          name = local.workspace_name
-          dbschema = var.db_schema
-        }
     }
   values_content_operator = {
         subscription = {
