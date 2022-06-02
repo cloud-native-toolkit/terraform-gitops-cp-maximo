@@ -96,9 +96,22 @@ variable "versionid" {
   default     = "8.x"
 }
 
+variable "installPlan" {
+  type        = string
+  description = "Install Plan for App"
+  default     = "Automatic"
+}
+
 variable "catalog_name" {
   type        = string
-  description = "Name of the IBM Operator OpenShift Catalog that contains MAS"
+  description = "App catalog source"
+  default     = "ibm-operator-catalog"
+}
+
+variable "catalog_namespace" {
+  type        = string
+  description = "Catalog source namespace"
+  default     = "openshift-marketplace"
 }
 
 variable "certmgr_namespace" {

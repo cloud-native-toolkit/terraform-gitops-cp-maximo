@@ -1,0 +1,19 @@
+apiVersion: core.mas.ibm.com/v1
+kind: Suite
+metadata:
+  name: {{ .Values.massuite.instanceid }}
+  namespace: {{ .Values.massuite.core-namespace }}
+  labels:
+    mas.ibm.com/instanceId: {{ .Values.massuite.instanceid }}
+    {{- include "ibm-masapp-suite.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  certManagerNamespace: {{ .Values.massuite.certmgr }}
+  domain: {{ .Values.massuite.cluster_ingress }}
+  settings:
+    icr:
+      cp: cp.icr.io/cp
+      cpopen: icr.io/cpopen
+  license:
+    accept: true

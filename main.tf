@@ -1,15 +1,45 @@
 locals {
-  name          = "maximo"
-  bin_dir       = module.setup_clis.bin_dir
-  yaml_dir      = "${path.cwd}/.tmp/${local.name}/chart/${local.name}"
-  inst_dir      = "${local.yaml_dir}/instance"
+  name           = "ibm-masapp-suite"
+  operator_name  = "ibm-masapp-suite-operator"
+  bin_dir        = module.setup_clis.bin_dir
+  tmp_dir        = "${path.cwd}/.tmp/${local.name}"
+  yaml_dir       = "${local.tmp_dir}/chart/${local.name}"
+  operator_yaml_dir = "${local.tmp_dir}/chart/${local.operator_name}"
 
-  layer = "services"
+  layer              = "services"
+  type               = "instances"
+  operator_type      = "operators"
   application_branch = "main"
-  type  = "base"
-  namespace = "mas-${var.instanceid}-core"
-  layer_config = var.gitops_config[local.layer]
-}
+
+  core-namespace     = "mas-${var.instanceid}-core"
+  admin_link         = "https://admin.${var.cluster_ingress}/"
+  layer_config       = var.gitops_config[local.layer]
+  installPlan        = var.installPlan
+ 
+# set values content for subscription
+  values_content = {
+        massuite = {
+          instanceid = var.instanceid
+          certmgr = var.certmgr_namespace
+          core-namespace = local.core-namespace
+          cluster_ingress = var.cluster_ingress
+          admin_link = local.admin_link
+        }
+        workspace = {
+          name = local.workspace_name
+          dbschema = var.db_schema
+        }
+    }
+  values_content_operator = {
+        subscription = {
+          channel = var.versionid
+          installPlanApproval = local.installPlan
+          source = var.catalog_name
+          sourceNamespace = var.catalog_namespace
+        }
+    }
+
+} 
 
 module setup_clis {
   source = "github.com/cloud-native-toolkit/terraform-util-clis.git"
@@ -22,7 +52,7 @@ module masNamespace {
 
   gitops_config = var.gitops_config
   git_credentials = var.git_credentials
-  name = "${local.namespace}"
+  name = "${local.core-namespace}"
   create_operator_group = true
 }
 
@@ -43,101 +73,58 @@ module "pullsecret" {
   secret_name = "ibm-entitlement"
 }
 
-
-# Install IBM Maximo Application Suite operator
-
-resource "null_resource" "deployMASop" {
-  depends_on = [module.pullsecret]
+# Add values for operator chart
+resource "null_resource" "deployOperator" {
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/deployMASop.sh '${local.yaml_dir}' ${var.versionid} '${local.namespace}'"
+    command = "${path.module}/scripts/create-operator-yaml.sh '${local.operator_name}' '${local.operator_yaml_dir}'"
 
     environment = {
-      BIN_DIR = local.bin_dir
+      VALUES_CONTENT = yamlencode(local.values_content_operator)
     }
   }
 }
 
-# Install IBM Maximo Application Suite core system instance
 
-resource "null_resource" "deployMASSuite" {
-  depends_on = [null_resource.deployMASop]
+# Add values for instance charts
+resource "null_resource" "deployInstance" {
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/deployMASSuite.sh '${local.inst_dir}' ${var.instanceid} '${local.namespace}' '${var.cluster_ingress}' '${var.certmgr_namespace}' "
+    command = "${path.module}/scripts/create-yaml.sh '${local.name}' '${local.yaml_dir}'"
 
     environment = {
-      BIN_DIR = local.bin_dir
+      VALUES_CONTENT = yamlencode(local.values_content)
     }
   }
 }
 
-resource null_resource setup_gitops_op {
-  depends_on = [null_resource.deployMASop]
 
-  triggers = {
-    name = local.name
-    namespace = local.namespace
-    yaml_dir = local.yaml_dir
-    server_name = var.server_name
-    layer = local.layer
-    type = local.type
-    git_credentials = yamlencode(var.git_credentials)
-    gitops_config   = yamlencode(var.gitops_config)
-    bin_dir = local.bin_dir
-  }
+# Deploy Operator
+resource gitops_module masapp_operator {
+  depends_on = [null_resource.deployOperator]
 
-  provisioner "local-exec" {
-    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
-              
-    environment = {
-      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
-      GITOPS_CONFIG   = self.triggers.gitops_config
-    }
-  }
+  name        = local.operator_name
+  namespace   = local.core-namespace
+  content_dir = local.operator_yaml_dir
+  server_name = var.server_name
+  layer       = local.layer
+  type        = local.operator_type
+  branch      = local.application_branch
+  config      = yamlencode(var.gitops_config)
+  credentials = yamlencode(var.git_credentials)
+}
 
-  provisioner "local-exec" {
-    when = destroy
-    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --delete --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
+# Deploy Instance
+resource gitops_module masapp {
+  depends_on = [gitops_module.masapp_operator]
 
-    environment = {
-      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
-      GITOPS_CONFIG   = self.triggers.gitops_config
-    }
-  }
-}  
-
-resource null_resource setup_gitops_suite {
-  depends_on = [null_resource.deployMASSuite,null_resource.setup_gitops_op]
-
-  triggers = {
-    name = "maximosuite"
-    namespace = local.namespace
-    inst_dir = local.inst_dir
-    server_name = var.server_name
-    layer = local.layer
-    type = local.type
-    git_credentials = yamlencode(var.git_credentials)
-    gitops_config   = yamlencode(var.gitops_config)
-    bin_dir = local.bin_dir
-  }
-
-  provisioner "local-exec" {
-    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
-
-    environment = {
-      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
-      GITOPS_CONFIG   = self.triggers.gitops_config
-    }
-  }
-
-  provisioner "local-exec" {
-    when = destroy
-    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --delete --contentDir '${self.triggers.inst_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
-
-    environment = {
-      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
-      GITOPS_CONFIG   = self.triggers.gitops_config
-    }
-  }
-} 
+  name        = local.name
+  namespace   = local.core-namespace
+  content_dir = local.yaml_dir
+  server_name = var.server_name
+  layer       = local.layer
+  type        = local.type
+  branch      = local.application_branch
+  config      = yamlencode(var.gitops_config)
+  credentials = yamlencode(var.git_credentials)
+}
