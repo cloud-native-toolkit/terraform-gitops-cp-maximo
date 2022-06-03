@@ -2,7 +2,7 @@ apiVersion: core.mas.ibm.com/v1
 kind: Suite
 metadata:
   name: {{ .Values.massuite.instanceid }}
-  namespace: {{ .Values.massuite.core-namespace }}
+  namespace: {{ .Values.massuite.namespace }}
   labels:
     mas.ibm.com/instanceId: {{ .Values.massuite.instanceid }}
     {{- include "ibm-masapp-suite.labels" . | nindent 4 }}

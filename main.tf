@@ -11,7 +11,7 @@ locals {
   operator_type      = "operators"
   application_branch = "main"
 
-  core-namespace     = "mas-${var.instanceid}-core"
+  namespace          = "mas-${var.instanceid}-core"
   admin_link         = "https://admin.${var.cluster_ingress}/"
   layer_config       = var.gitops_config[local.layer]
   installPlan        = var.installPlan
@@ -21,7 +21,7 @@ locals {
         massuite = {
           instanceid = var.instanceid
           certmgr = var.certmgr_namespace
-          core-namespace = local.core-namespace
+          namespace = local.namespace
           cluster_ingress = var.cluster_ingress
           admin_link = local.admin_link
         }
@@ -42,13 +42,12 @@ module setup_clis {
 }
 
 # Create the namespace and pullsecret needed for MAS
-
 module masNamespace {
   source = "github.com/cloud-native-toolkit/terraform-gitops-namespace.git"
 
   gitops_config = var.gitops_config
   git_credentials = var.git_credentials
-  name = "${local.core-namespace}"
+  name = "${local.namespace}"
   create_operator_group = true
 }
 
@@ -73,7 +72,7 @@ module "pullsecret" {
 resource "null_resource" "deployOperator" {
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-operator-yaml.sh '${local.operator_name}' '${local.operator_yaml_dir}'"
+    command = "${path.module}/scripts/create-yaml.sh '${local.operator_name}' '${local.operator_yaml_dir}'"
 
     environment = {
       VALUES_CONTENT = yamlencode(local.values_content_operator)
@@ -100,7 +99,7 @@ resource gitops_module masapp_operator {
   depends_on = [null_resource.deployOperator,module.masNamespace,module.pullsecret]
 
   name        = local.operator_name
-  namespace   = local.core-namespace
+  namespace   = local.namespace
   content_dir = local.operator_yaml_dir
   server_name = var.server_name
   layer       = local.layer
@@ -112,10 +111,10 @@ resource gitops_module masapp_operator {
 
 # Deploy Instance
 resource gitops_module masapp {
-  depends_on = [gitops_module.masapp_operator]
+  depends_on = [null_resource.deployInstance,gitops_module.masapp_operator]
 
   name        = local.name
-  namespace   = local.core-namespace
+  namespace   = local.namespace
   content_dir = local.yaml_dir
   server_name = var.server_name
   layer       = local.layer
