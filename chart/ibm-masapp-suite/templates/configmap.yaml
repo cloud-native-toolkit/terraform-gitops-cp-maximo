@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    console-link.cloud-native-toolkit.dev/enabled: "true"
+    {{- include "ibm-masapp-suite.labels" . | nindent 4 }}
+  annotations:
+    console-link.cloud-native-toolkit.dev/section: MAS Application Suite
+    console-link.cloud-native-toolkit.dev/location: ApplicationMenu
+    console-link.cloud-native-toolkit.dev/displayName: Admin Workspace
+    argocd.argoproj.io/sync-wave: "2"  
+  name: masadminlink
+data:
+  url: {{ .Values.massuite.admin_link }}

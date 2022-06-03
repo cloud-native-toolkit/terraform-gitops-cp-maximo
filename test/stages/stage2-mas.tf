@@ -1,4 +1,4 @@
-module "mas_appsuite" {
+module "gitops_module" {
   source = "./module"
 
   gitops_config = module.gitops.gitops_config
@@ -17,6 +17,8 @@ module "mas_appsuite" {
 }
 
 resource null_resource write_namespace {
+  depends_on = [module.gitops_module]
+  
   provisioner "local-exec" {
     command = "echo -n 'mas-mas8-core' > .namespace"
   }

@@ -1,22 +1,33 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
+
+source "${SCRIPT_DIR}/validation-functions.sh"
+
 GIT_REPO=$(cat git_repo)
 GIT_TOKEN=$(cat git_token)
 
+BIN_DIR=$(cat .bin_dir)
+
+export PATH="${BIN_DIR}:${PATH}"
+
+if ! command -v oc 1> /dev/null 2> /dev/null; then
+  echo "oc cli not found" >&2
+  exit 1
+fi
+
+if ! command -v kubectl 1> /dev/null 2> /dev/null; then
+  echo "kubectl cli not found" >&2
+  exit 1
+fi
+
 export KUBECONFIG=$(cat .kubeconfig)
 NAMESPACE=$(cat .namespace)
-#COMPONENT_NAME=$(jq -r '.name // "my-module"' gitops-output.json)
-#BRANCH=$(jq -r '.branch // "main"' gitops-output.json)
-#SERVER_NAME=$(jq -r '.server_name // "default"' gitops-output.json)
-#LAYER=$(jq -r '.layer_dir // "2-services"' gitops-output.json)
-#TYPE=$(jq -r '.type // "base"' gitops-output.json)
-
-BRANCH="main"
-SERVER_NAME="default"
-TYPE="base"
-LAYER="2-services"
-
-COMPONENT_NAME="maximo"
+COMPONENT_NAME=$(jq -r '.name // "my-module"' gitops-output.json)
+BRANCH=$(jq -r '.branch // "main"' gitops-output.json)
+SERVER_NAME=$(jq -r '.server_name // "default"' gitops-output.json)
+LAYER=$(jq -r '.layer_dir // "2-services"' gitops-output.json)
+TYPE=$(jq -r '.type // "base"' gitops-output.json)
 
 
 mkdir -p .testrepo
@@ -27,61 +38,18 @@ cd .testrepo || exit 1
 
 find . -name "*"
 
-if [[ ! -f "argocd/${LAYER}/cluster/${SERVER_NAME}/${TYPE}/${NAMESPACE}-${COMPONENT_NAME}.yaml" ]]; then
-  echo "ArgoCD config missing - argocd/${LAYER}/cluster/${SERVER_NAME}/${TYPE}/${NAMESPACE}-${COMPONENT_NAME}.yaml"
-  exit 1
-fi
 
-echo "Printing argocd/${LAYER}/cluster/${SERVER_NAME}/${TYPE}/${NAMESPACE}-${COMPONENT_NAME}.yaml"
-cat "argocd/${LAYER}/cluster/${SERVER_NAME}/${TYPE}/${NAMESPACE}-${COMPONENT_NAME}.yaml"
+validate_gitops_content "${NAMESPACE}" "${LAYER}" "${SERVER_NAME}" "${TYPE}" "${COMPONENT_NAME}" "values.yaml"
+check_k8s_namespace "${NAMESPACE}"
 
-if [[ ! -f "payload/${LAYER}/namespace/${NAMESPACE}/${COMPONENT_NAME}/ibm-mas-op.yaml" ]]; then
-  echo "Application values not found - payload/${LAYER}/namespace/${NAMESPACE}/${COMPONENT_NAME}/ibm-mas-op.yaml"
-  exit 1
-fi
+## check operator deployment
+check_k8s_resource "${NAMESPACE}" deployment "ibm-mas-operator"
 
-echo "Printing payload/${LAYER}/namespace/${NAMESPACE}/${COMPONENT_NAME}/ibm-mas-op.yaml"
-cat "payload/${LAYER}/namespace/${NAMESPACE}/${COMPONENT_NAME}/ibm-mas-op.yaml"
+## check mas suite deployment  
+check_k8s_resource "${NAMESPACE}" deployment "mas8-coreidp-login"
 
-count=0
-until kubectl get namespace "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
-  echo "Waiting for namespace: ${NAMESPACE}"
-  count=$((count + 1))
-  sleep 15
-done
 
-if [[ $count -eq 20 ]]; then
-  echo "Timed out waiting for namespace: ${NAMESPACE}"
-  exit 1
-else
-  echo "Found namespace: ${NAMESPACE}. Sleeping for 30 seconds to wait for everything to settle down"
-  sleep 30
-fi
-#wait for deployment
-sleep 5m
-
-# deplopyment check for mas operator
-
-count=0
-until kubectl get deployment ibm-mas-operator -n ${NAMESPACE} || [[ $count -eq 20 ]]; do
-  echo "Waiting for deployment/ibm-mas-operator in ${NAMESPACE}"
-  count=$((count + 1))
-  sleep 60
-done
-
-kubectl rollout status "deployment/ibm-mas-operator" -n "${NAMESPACE}" || exit 1
-
-# instance check
-
-count=0
-until kubectl get deployment mas8-coreidp-login -n ${NAMESPACE} || [[ $count -eq 20 ]]; do
-  echo "Waiting for deployment/mas8-coreidp-login in ${NAMESPACE}"
-  count=$((count + 1))
-  sleep 60
-done
-
-kubectl rollout status "deployment/mas8-coreidp-login" -n "${NAMESPACE}" || exit 1
+kubectl get deployments -n ${NAMESPACE}
 
 cd ..
 rm -rf .testrepo
-
