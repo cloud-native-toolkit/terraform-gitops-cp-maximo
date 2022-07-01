@@ -10,6 +10,12 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
 spec:
   certManagerNamespace: {{ .Values.massuite.certmgr }}
+  {{- if ne .Values.massuite.issuer_name "" }}
+  certificateIssuer:
+    name: {{ .Values.massuite.issuer_name | quote }}
+    duration: {{ .Values.massuite.issuer_duration | quote }}
+    renewBefore: {{ .Values.massuite.issuer_renewbefore | quote }}
+  {{- end }}
   domain: {{ .Values.massuite.cluster_ingress }}
   settings:
     icr:

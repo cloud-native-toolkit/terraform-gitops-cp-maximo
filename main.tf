@@ -24,6 +24,9 @@ locals {
           namespace = local.namespace
           cluster_ingress = var.cluster_ingress
           admin_link = local.admin_link
+          issuer_name =  var.issuer_name
+          issuer_duration = var.issuer_duration
+          issuer_renewBefore = var.issuer_renewbefore
         }
     }
   values_content_operator = {
