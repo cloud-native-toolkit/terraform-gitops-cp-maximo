@@ -119,3 +119,21 @@ variable "certmgr_namespace" {
   description = "Namespace of the cert-manager: should stay default value unless using another cert manager"
   default     = "ibm-common-services"
 }
+
+variable "issuer_name" {
+  type        = string
+  description = "Certificate Issuer name to use if not using self signed certs"
+  default     = ""
+}
+
+variable "issuer_duration" {
+  type        = string
+  description = "Certificate duration to use if not using self signed certs"
+  default     = ""
+}
+
+variable "issuer_renewbefore" {
+  type        = string
+  description = "Certificate renew before definion to use if not using self signed certs"
+  default     = ""
+}
