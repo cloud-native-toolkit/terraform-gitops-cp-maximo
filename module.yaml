@@ -14,7 +14,23 @@ versions:
       - id: catalog
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-cp-catalogs.git
-            version: ">= 1.0.0"                 
+            version: ">= 1.0.0"
+      - id: mongo-operator
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-mongo-ce-operator.git
+            version: '>= 1.0.0'
+      - id: mongo
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-mongo-ce.git
+            version: '>= 1.0.0'
+      - id: sls
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-cp-sls.git
+            version: '>= 2.3.0'
+      - id: bas
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-gitops-cp-bas.git
+            version: '>= 1.0.0'
     variables:
       - name: gitops_config
         moduleRef:

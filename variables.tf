@@ -122,18 +122,18 @@ variable "certmgr_namespace" {
 
 variable "issuer_name" {
   type        = string
-  description = "Certificate Issuer name to use if not using self signed certs"
+  description = "Certificate Issuer name on the cluster to use if not using self signed certs"
   default     = ""
 }
 
 variable "issuer_duration" {
   type        = string
-  description = "Certificate duration to use if not using self signed certs"
+  description = "Certificate duration to use if not using self signed certs - Example: 8760h0m0s"
   default     = ""
 }
 
 variable "issuer_renewbefore" {
   type        = string
-  description = "Certificate renew before definion to use if not using self signed certs"
+  description = "Certificate renew before definion to use if not using self signed certs - Example: 720h0m0s"
   default     = ""
 }
