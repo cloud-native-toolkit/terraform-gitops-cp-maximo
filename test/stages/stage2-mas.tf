@@ -10,10 +10,7 @@ module "gitops_module" {
   cluster_ingress = module.dev_cluster.platform.ingress
 
   catalog_name = module.catalog.catalog_ibmoperators
-
-  versionid = "8.x"
   instanceid = "mas8"
-
 }
 
 resource null_resource write_namespace {
