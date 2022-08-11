@@ -93,7 +93,7 @@ variable "instanceid" {
 variable "versionid" {
   type        = string
   description = "version for MAS - this must match the update channel: 8.x for latest"
-  default     = "8.x"
+  default     = "8.7.x"
 }
 
 variable "installPlan" {
